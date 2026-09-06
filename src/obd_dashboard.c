@@ -12,6 +12,7 @@
  */
 
 #include "obd_dashboard.h"
+#include "img_kia_sportage.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -103,6 +104,7 @@ typedef struct
     lv_obj_t *needle_roll;
     lv_obj_t *arc_roll_val;
     lv_obj_t *hub_roll;
+    lv_obj_t *img_car_roll;
     lv_obj_t *line_car_roll;
     lv_obj_t *line_grille_roll;
     lv_obj_t *line_horizon_roll;
@@ -117,6 +119,7 @@ typedef struct
     lv_obj_t *needle_pitch;
     lv_obj_t *arc_pitch_val;
     lv_obj_t *hub_pitch;
+    lv_obj_t *img_car_pitch;
     lv_obj_t *line_car_pitch;
     lv_obj_t *line_horizon_pitch;
     lv_point_precise_t pts_car_pitch[CAR_SIDE_PTS_COUNT];
@@ -826,20 +829,11 @@ static void build_offroad_view(lv_obj_t *parent)
     rotate_vector_points(g_base_horizon, g_ui.pts_horizon_roll, HORIZON_PTS_COUNT, 0, 47, 24);
     lv_line_set_points(g_ui.line_horizon_roll, g_ui.pts_horizon_roll, HORIZON_PTS_COUNT);
 
-    /* Suzuki Jimny JB74 Front Rotating Vehicle Silhouette */
-    g_ui.line_car_roll = lv_line_create(g_ui.hub_roll);
-    lv_obj_set_style_line_color(g_ui.line_car_roll, COLOR_ACCENT_CYAN, LV_PART_MAIN);
-    lv_obj_set_style_line_width(g_ui.line_car_roll, 2, LV_PART_MAIN);
-    lv_obj_set_style_line_rounded(g_ui.line_car_roll, true, LV_PART_MAIN);
-    rotate_vector_points(g_base_car_front, g_ui.pts_car_roll, CAR_FRONT_PTS_COUNT, 0, 47, 24);
-    lv_line_set_points(g_ui.line_car_roll, g_ui.pts_car_roll, CAR_FRONT_PTS_COUNT);
-
-    /* Suzuki Jimny JB74 5-Slot Grille & Round Headlights */
-    g_ui.line_grille_roll = lv_line_create(g_ui.hub_roll);
-    lv_obj_set_style_line_color(g_ui.line_grille_roll, COLOR_ACCENT_CYAN, LV_PART_MAIN);
-    lv_obj_set_style_line_width(g_ui.line_grille_roll, 1, LV_PART_MAIN);
-    rotate_vector_points(g_base_car_grille, g_ui.pts_grille_roll, CAR_GRILLE_PTS_COUNT, 0, 47, 24);
-    lv_line_set_points(g_ui.line_grille_roll, g_ui.pts_grille_roll, CAR_GRILLE_PTS_COUNT);
+    /* Kia Sportage Front Image Silhouette */
+    g_ui.img_car_roll = lv_image_create(g_ui.hub_roll);
+    lv_image_set_src(g_ui.img_car_roll, &img_kia_sportage_front);
+    lv_obj_align(g_ui.img_car_roll, LV_ALIGN_CENTER, 0, -18);
+    lv_image_set_pivot(g_ui.img_car_roll, 28, 24);
 
     g_ui.lbl_roll_val = lv_label_create(g_ui.hub_roll);
     lv_label_set_text(g_ui.lbl_roll_val, "0° LEVEL");
@@ -930,13 +924,11 @@ static void build_offroad_view(lv_obj_t *parent)
     rotate_vector_points(g_base_horizon, g_ui.pts_horizon_pitch, HORIZON_PTS_COUNT, 0, 47, 24);
     lv_line_set_points(g_ui.line_horizon_pitch, g_ui.pts_horizon_pitch, HORIZON_PTS_COUNT);
 
-    /* 4x4 Side Rotating Vehicle Silhouette */
-    g_ui.line_car_pitch = lv_line_create(g_ui.hub_pitch);
-    lv_obj_set_style_line_color(g_ui.line_car_pitch, COLOR_ACCENT_BLUE, LV_PART_MAIN);
-    lv_obj_set_style_line_width(g_ui.line_car_pitch, 2, LV_PART_MAIN);
-    lv_obj_set_style_line_rounded(g_ui.line_car_pitch, true, LV_PART_MAIN);
-    rotate_vector_points(g_base_car_side, g_ui.pts_car_pitch, CAR_SIDE_PTS_COUNT, 0, 47, 24);
-    lv_line_set_points(g_ui.line_car_pitch, g_ui.pts_car_pitch, CAR_SIDE_PTS_COUNT);
+    /* Kia Sportage Side Profile Image */
+    g_ui.img_car_pitch = lv_image_create(g_ui.hub_pitch);
+    lv_image_set_src(g_ui.img_car_pitch, &img_kia_sportage_side);
+    lv_obj_align(g_ui.img_car_pitch, LV_ALIGN_CENTER, 0, -18);
+    lv_image_set_pivot(g_ui.img_car_pitch, 34, 14);
 
     g_ui.lbl_pitch_val = lv_label_create(g_ui.hub_pitch);
     lv_label_set_text(g_ui.lbl_pitch_val, "0° LEVEL");
@@ -1270,16 +1262,10 @@ void obd_dashboard_update(const obd2_telemetry_t *data)
             lv_arc_set_value(g_ui.arc_roll_val, (int32_t)roll);
         }
 
-        /* Dynamically rotate Suzuki Jimny JB74 Front Silhouette & Grille */
-        if (g_ui.line_car_roll)
+        /* Dynamically rotate Kia Sportage Front Image Silhouette */
+        if (g_ui.img_car_roll)
         {
-            rotate_vector_points(g_base_car_front, g_ui.pts_car_roll, CAR_FRONT_PTS_COUNT, roll, 47, 24);
-            lv_line_set_points(g_ui.line_car_roll, g_ui.pts_car_roll, CAR_FRONT_PTS_COUNT);
-        }
-        if (g_ui.line_grille_roll)
-        {
-            rotate_vector_points(g_base_car_grille, g_ui.pts_grille_roll, CAR_GRILLE_PTS_COUNT, roll, 47, 24);
-            lv_line_set_points(g_ui.line_grille_roll, g_ui.pts_grille_roll, CAR_GRILLE_PTS_COUNT);
+            lv_image_set_rotation(g_ui.img_car_roll, (int32_t)(roll * 10.0f));
         }
 
         char buf[32];
@@ -1306,10 +1292,6 @@ void obd_dashboard_update(const obd2_telemetry_t *data)
             lv_obj_set_style_border_color(g_ui.card_roll, COLOR_ALERT_RED, LV_PART_MAIN);
             if (g_ui.arc_roll_val)
                 lv_obj_set_style_arc_color(g_ui.arc_roll_val, COLOR_ALERT_RED, LV_PART_INDICATOR);
-            if (g_ui.line_car_roll)
-                lv_obj_set_style_line_color(g_ui.line_car_roll, COLOR_ALERT_RED, LV_PART_MAIN);
-            if (g_ui.line_grille_roll)
-                lv_obj_set_style_line_color(g_ui.line_grille_roll, COLOR_ALERT_RED, LV_PART_MAIN);
         }
         else if (abs_roll >= OFFROAD_ROLL_WARN_THRESH)
         {
@@ -1319,10 +1301,6 @@ void obd_dashboard_update(const obd2_telemetry_t *data)
             lv_obj_set_style_border_color(g_ui.card_roll, COLOR_WARN_AMBER, LV_PART_MAIN);
             if (g_ui.arc_roll_val)
                 lv_obj_set_style_arc_color(g_ui.arc_roll_val, COLOR_WARN_AMBER, LV_PART_INDICATOR);
-            if (g_ui.line_car_roll)
-                lv_obj_set_style_line_color(g_ui.line_car_roll, COLOR_WARN_AMBER, LV_PART_MAIN);
-            if (g_ui.line_grille_roll)
-                lv_obj_set_style_line_color(g_ui.line_grille_roll, COLOR_WARN_AMBER, LV_PART_MAIN);
         }
         else
         {
@@ -1332,10 +1310,6 @@ void obd_dashboard_update(const obd2_telemetry_t *data)
             lv_obj_set_style_border_color(g_ui.card_roll, COLOR_BORDER_SUBTLE, LV_PART_MAIN);
             if (g_ui.arc_roll_val)
                 lv_obj_set_style_arc_color(g_ui.arc_roll_val, COLOR_ACCENT_CYAN, LV_PART_INDICATOR);
-            if (g_ui.line_car_roll)
-                lv_obj_set_style_line_color(g_ui.line_car_roll, COLOR_ACCENT_CYAN, LV_PART_MAIN);
-            if (g_ui.line_grille_roll)
-                lv_obj_set_style_line_color(g_ui.line_grille_roll, COLOR_ACCENT_CYAN, LV_PART_MAIN);
         }
     }
 
@@ -1357,11 +1331,10 @@ void obd_dashboard_update(const obd2_telemetry_t *data)
             lv_arc_set_value(g_ui.arc_pitch_val, (int32_t)pitch);
         }
 
-        /* Dynamically rotate 4x4 Side Profile Silhouette */
-        if (g_ui.line_car_pitch)
+        /* Dynamically rotate Kia Sportage Side Profile Image */
+        if (g_ui.img_car_pitch)
         {
-            rotate_vector_points(g_base_car_side, g_ui.pts_car_pitch, CAR_SIDE_PTS_COUNT, pitch, 47, 24);
-            lv_line_set_points(g_ui.line_car_pitch, g_ui.pts_car_pitch, CAR_SIDE_PTS_COUNT);
+            lv_image_set_rotation(g_ui.img_car_pitch, (int32_t)(pitch * 10.0f));
         }
 
         char buf[32];
@@ -1390,8 +1363,6 @@ void obd_dashboard_update(const obd2_telemetry_t *data)
             lv_obj_set_style_border_color(g_ui.card_pitch, COLOR_ALERT_RED, LV_PART_MAIN);
             if (g_ui.arc_pitch_val)
                 lv_obj_set_style_arc_color(g_ui.arc_pitch_val, COLOR_ALERT_RED, LV_PART_INDICATOR);
-            if (g_ui.line_car_pitch)
-                lv_obj_set_style_line_color(g_ui.line_car_pitch, COLOR_ALERT_RED, LV_PART_MAIN);
         }
         else if (abs_pitch >= OFFROAD_PITCH_WARN_THRESH)
         {
@@ -1399,8 +1370,6 @@ void obd_dashboard_update(const obd2_telemetry_t *data)
             lv_obj_set_style_border_color(g_ui.card_pitch, COLOR_WARN_AMBER, LV_PART_MAIN);
             if (g_ui.arc_pitch_val)
                 lv_obj_set_style_arc_color(g_ui.arc_pitch_val, COLOR_WARN_AMBER, LV_PART_INDICATOR);
-            if (g_ui.line_car_pitch)
-                lv_obj_set_style_line_color(g_ui.line_car_pitch, COLOR_WARN_AMBER, LV_PART_MAIN);
         }
         else
         {
@@ -1408,8 +1377,6 @@ void obd_dashboard_update(const obd2_telemetry_t *data)
             lv_obj_set_style_border_color(g_ui.card_pitch, COLOR_BORDER_SUBTLE, LV_PART_MAIN);
             if (g_ui.arc_pitch_val)
                 lv_obj_set_style_arc_color(g_ui.arc_pitch_val, COLOR_ACCENT_BLUE, LV_PART_INDICATOR);
-            if (g_ui.line_car_pitch)
-                lv_obj_set_style_line_color(g_ui.line_car_pitch, COLOR_ACCENT_BLUE, LV_PART_MAIN);
         }
     }
 
