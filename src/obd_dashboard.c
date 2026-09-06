@@ -2,7 +2,7 @@
  * @file obd_dashboard.c
  * @brief Modern Circular Cockpit OBD2 Smart Gauge & 4x4 Inclinometer Component
  * @author Embedded Systems & Automotive GUI Engineer
- * 
+ *
  * Implements the photorealistic smart gauge HUD:
  * - Center: High-Contrast Speedometer Dial (0-200 km/h) with Glowing Crimson Needle & Large Digital km/h
  * - Left: Progressive Neon RPM Arc (0-8 x1000 RPM) with Digital RPM Readout
@@ -18,22 +18,23 @@
 /* =========================================================================
  * 1. UI Theme Color Palette (Modern Cockpit Dark High-Contrast)
  * ========================================================================= */
-#define COLOR_BG_MAIN       lv_color_hex(0x06080C) /* Deep Cockpit Pitch Black */
-#define COLOR_PANEL_BG      lv_color_hex(0x0D1117) /* Matte Carbon Dial Face */
+#define COLOR_BG_MAIN lv_color_hex(0x06080C)       /* Deep Cockpit Pitch Black */
+#define COLOR_PANEL_BG lv_color_hex(0x0D1117)      /* Matte Carbon Dial Face */
 #define COLOR_BORDER_SUBTLE lv_color_hex(0x1F2937) /* Sleek Dark Slate Border */
-#define COLOR_ACCENT_CYAN   lv_color_hex(0x00E5FF) /* High-Vis Neon Cyan */
-#define COLOR_ACCENT_BLUE   lv_color_hex(0x0284C7) /* Electric Cobalt Blue */
-#define COLOR_ALERT_RED     lv_color_hex(0xFF2A2A) /* Glowing Crimson Sport Needle / Redline */
-#define COLOR_WARN_AMBER    lv_color_hex(0xF59E0B) /* Warning Amber */
-#define COLOR_SAFE_GREEN    lv_color_hex(0x10B981) /* Connected Emerald */
-#define COLOR_TEXT_PRIMARY  lv_color_hex(0xF8FAFC) /* Crisp Pure White */
-#define COLOR_TEXT_MUTED    lv_color_hex(0x94A3B8) /* Silver Slate */
-#define COLOR_TEXT_DIM      lv_color_hex(0x475569) /* Dimmed Inactive */
+#define COLOR_ACCENT_CYAN lv_color_hex(0x00E5FF)   /* High-Vis Neon Cyan */
+#define COLOR_ACCENT_BLUE lv_color_hex(0x0284C7)   /* Electric Cobalt Blue */
+#define COLOR_ALERT_RED lv_color_hex(0xFF2A2A)     /* Glowing Crimson Sport Needle / Redline */
+#define COLOR_WARN_AMBER lv_color_hex(0xF59E0B)    /* Warning Amber */
+#define COLOR_SAFE_GREEN lv_color_hex(0x10B981)    /* Connected Emerald */
+#define COLOR_TEXT_PRIMARY lv_color_hex(0xF8FAFC)  /* Crisp Pure White */
+#define COLOR_TEXT_MUTED lv_color_hex(0x94A3B8)    /* Silver Slate */
+#define COLOR_TEXT_DIM lv_color_hex(0x475569)      /* Dimmed Inactive */
 
 /* =========================================================================
  * 2. Static UI Object References (Pre-allocated for Zero Dynamic Allocation)
  * ========================================================================= */
-typedef struct {
+typedef struct
+{
     /* Root Containers */
     lv_obj_t *root_cont;
     lv_obj_t *status_bar;
@@ -91,10 +92,10 @@ typedef struct {
     lv_obj_t *lbl_time_val;
     lv_obj_t *lbl_bottom_brand;
 
-#define CAR_SIDE_PTS_COUNT   22
-#define CAR_FRONT_PTS_COUNT  21
+#define CAR_SIDE_PTS_COUNT 22
+#define CAR_FRONT_PTS_COUNT 21
 #define CAR_GRILLE_PTS_COUNT 10
-#define HORIZON_PTS_COUNT    2
+#define HORIZON_PTS_COUNT 2
 
     /* ================= PAGE 2: 4x4 Off-Road Inclinometer ================= */
     lv_obj_t *card_roll;
@@ -143,49 +144,74 @@ static lv_timer_t *g_mock_timer = NULL;
 
 /* Base 2D Vector Model for Suzuki Jimny JB74 Front Silhouette (Roll, 21 points) */
 static const lv_point_precise_t g_base_car_front[CAR_FRONT_PTS_COUNT] = {
-    {-14, -13}, { 14, -13}, /* Boxy Roof Rain Gutter */
-    { 16,  -4},             /* Right A-Pillar */
-    { 21,  -4}, { 21,  -1}, { 16,  -1}, /* Right Side Mirror */
-    { 20,   2}, { 20,   9}, { 15,   9}, /* Right Tire & Wide Fender Flare */
-    { 15,   4}, { 10,   5}, {-10,   5}, {-15,   4}, /* Front Bumper & Skid Plate */
-    {-15,   9}, {-20,   9}, {-20,   2}, /* Left Tire & Wide Fender Flare */
-    {-16,  -1}, {-21,  -1}, {-21,  -4}, /* Left Side Mirror */
-    {-16,  -4},             /* Left A-Pillar */
-    {-14, -13}              /* Loop Close */
+    {-14, -13}, {14, -13}, /* Boxy Roof Rain Gutter */
+    {16, -4},              /* Right A-Pillar */
+    {21, -4},
+    {21, -1},
+    {16, -1}, /* Right Side Mirror */
+    {20, 2},
+    {20, 9},
+    {15, 9}, /* Right Tire & Wide Fender Flare */
+    {15, 4},
+    {10, 5},
+    {-10, 5},
+    {-15, 4}, /* Front Bumper & Skid Plate */
+    {-15, 9},
+    {-20, 9},
+    {-20, 2}, /* Left Tire & Wide Fender Flare */
+    {-16, -1},
+    {-21, -1},
+    {-21, -4}, /* Left Side Mirror */
+    {-16, -4}, /* Left A-Pillar */
+    {-14, -13} /* Loop Close */
 };
 
 /* Base 2D Vector Model for Suzuki Jimny JB74 Front Grille & Round Headlights (10 points) */
 static const lv_point_precise_t g_base_car_grille[CAR_GRILLE_PTS_COUNT] = {
     {-12, 1}, {-10, -2}, {-7, -2}, {-7, 1}, /* Left Round Headlight */
-    {-3, 0}, { 3, 0},                       /* 5-Slot Center Grille Bar */
-    { 7, 1}, { 7, -2}, { 10, -2}, { 12, 1}  /* Right Round Headlight */
+    {-3, 0},
+    {3, 0}, /* 5-Slot Center Grille Bar */
+    {7, 1},
+    {7, -2},
+    {10, -2},
+    {12, 1} /* Right Round Headlight */
 };
 
 /* Base 2D Vector Model for Suzuki Jimny JB74 Side Profile (Pitch, 22 points) */
 static const lv_point_precise_t g_base_car_side[CAR_SIDE_PTS_COUNT] = {
-    {-15, -13}, {  7, -13}, /* Boxy Flat Roof */
-    { 13,  -2},             /* Upright Windshield */
-    { 22,  -2},             /* Flat Hood */
-    { 24,   3}, { 21,   6}, /* Rugged Front Bumper */
-    { 19,   2}, { 11,   2}, { 10,   6}, /* Front Squared Wheel Arch */
-    { -5,   6},             /* Rocker Sill / Side Step */
-    { -6,   2}, {-14,   2}, {-15,   6}, /* Rear Squared Wheel Arch */
-    {-19,   6}, {-20,   3}, /* Rear Bumper */
-    {-24,   2}, {-25,  -3}, {-25,  -8}, {-20,  -8}, /* Iconic Tailgate Spare Tire */
-    {-18,  -3},             /* Tailgate Lower */
-    {-16, -13},             /* Upright Rear Pillar */
-    {-15, -13}              /* Loop Close */
+    {-15, -13}, {7, -13}, /* Boxy Flat Roof */
+    {13, -2},             /* Upright Windshield */
+    {22, -2},             /* Flat Hood */
+    {24, 3},
+    {21, 6}, /* Rugged Front Bumper */
+    {19, 2},
+    {11, 2},
+    {10, 6}, /* Front Squared Wheel Arch */
+    {-5, 6}, /* Rocker Sill / Side Step */
+    {-6, 2},
+    {-14, 2},
+    {-15, 6}, /* Rear Squared Wheel Arch */
+    {-19, 6},
+    {-20, 3}, /* Rear Bumper */
+    {-24, 2},
+    {-25, -3},
+    {-25, -8},
+    {-20, -8},  /* Iconic Tailgate Spare Tire */
+    {-18, -3},  /* Tailgate Lower */
+    {-16, -13}, /* Upright Rear Pillar */
+    {-15, -13}  /* Loop Close */
 };
 
 static const lv_point_precise_t g_base_horizon[HORIZON_PTS_COUNT] = {
-    {-30, 10}, {30, 10}
-};
+    {-30, 10}, {30, 10}};
 
-static void rotate_vector_points(const lv_point_precise_t *src, lv_point_precise_t *dst, uint32_t count, float angle_deg, int32_t cx, int32_t cy) {
+static void rotate_vector_points(const lv_point_precise_t *src, lv_point_precise_t *dst, uint32_t count, float angle_deg, int32_t cx, int32_t cy)
+{
     float rad = angle_deg * 3.14159265f / 180.0f;
     float cos_a = cosf(rad);
     float sin_a = sinf(rad);
-    for (uint32_t i = 0; i < count; i++) {
+    for (uint32_t i = 0; i < count; i++)
+    {
         float x = (float)src[i].x;
         float y = (float)src[i].y;
         dst[i].x = (lv_value_precise_t)(cx + (x * cos_a - y * sin_a));
@@ -194,7 +220,7 @@ static void rotate_vector_points(const lv_point_precise_t *src, lv_point_precise
 }
 
 /* Scale Label Strings */
-static const char *g_speed_labels[]  = {"0", "20", "40", "60", "80", "100", "120", "140", "160", "180", "200", NULL};
+static const char *g_speed_labels[] = {"0", "20", "40", "60", "80", "100", "120", "140", "160", "180", "200", NULL};
 static const char *g_incline_labels[] = {"-40", "-20", "0", "+20", "+40", NULL};
 
 static void mode_toggle_event_cb(lv_event_t *e);
@@ -202,8 +228,10 @@ static void mode_toggle_event_cb(lv_event_t *e);
 /* =========================================================================
  * 3. Style Initialization Helper
  * ========================================================================= */
-static void obd_styles_init(void) {
-    if (g_ui.styles_initialized) return;
+static void obd_styles_init(void)
+{
+    if (g_ui.styles_initialized)
+        return;
 
     /* Modern Panel Card Style */
     lv_style_init(&g_ui.style_panel_card);
@@ -235,7 +263,8 @@ static void obd_styles_init(void) {
 /**
  * @brief Construct the Status Bar
  */
-static void build_status_bar(lv_obj_t *parent) {
+static void build_status_bar(lv_obj_t *parent)
+{
     g_ui.status_bar = lv_obj_create(parent);
     lv_obj_set_size(g_ui.status_bar, lv_pct(100), 26);
     lv_obj_set_style_bg_color(g_ui.status_bar, lv_color_hex(0x0A0D13), LV_PART_MAIN);
@@ -307,7 +336,8 @@ static void build_status_bar(lv_obj_t *parent) {
 /**
  * @brief Construct Page 1: Modern Smart Gauge Cockpit (Exact Image Mockup Layout)
  */
-static void build_cockpit_view(lv_obj_t *parent) {
+static void build_cockpit_view(lv_obj_t *parent)
+{
     g_ui.view_cockpit = lv_obj_create(parent);
     lv_obj_set_size(g_ui.view_cockpit, lv_pct(100), lv_pct(89));
     lv_obj_set_style_bg_opa(g_ui.view_cockpit, LV_OPA_TRANSP, LV_PART_MAIN);
@@ -330,10 +360,10 @@ static void build_cockpit_view(lv_obj_t *parent) {
     lv_obj_set_flex_align(tri_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     /* =========================================================================
-     * SECTION 1: Left Progressive Tachometer Arc Panel (24% Width)
+     * SECTION 1: Left Progressive Tachometer Arc Panel (23% Width)
      * ========================================================================= */
     g_ui.panel_left_rpm = lv_obj_create(tri_row);
-    lv_obj_set_size(g_ui.panel_left_rpm, lv_pct(24), lv_pct(100));
+    lv_obj_set_size(g_ui.panel_left_rpm, lv_pct(23), lv_pct(100));
     lv_obj_add_style(g_ui.panel_left_rpm, &g_ui.style_panel_card, LV_PART_MAIN);
     lv_obj_clear_flag(g_ui.panel_left_rpm, LV_OBJ_FLAG_SCROLLABLE);
 
@@ -395,10 +425,10 @@ static void build_cockpit_view(lv_obj_t *parent) {
     lv_obj_align(lbl_rpm_scale, LV_ALIGN_BOTTOM_MID, 0, -2);
 
     /* =========================================================================
-     * SECTION 2: Center Prominent Analog Speedometer Dial Panel (48% Width)
+     * SECTION 2: Center Prominent Analog Speedometer Dial Panel (47% Width)
      * ========================================================================= */
     g_ui.panel_center_speed = lv_obj_create(tri_row);
-    lv_obj_set_size(g_ui.panel_center_speed, lv_pct(48), lv_pct(100));
+    lv_obj_set_size(g_ui.panel_center_speed, lv_pct(47), lv_pct(100));
     lv_obj_add_style(g_ui.panel_center_speed, &g_ui.style_panel_card, LV_PART_MAIN);
     lv_obj_clear_flag(g_ui.panel_center_speed, LV_OBJ_FLAG_SCROLLABLE);
 
@@ -439,7 +469,7 @@ static void build_cockpit_view(lv_obj_t *parent) {
     /* Center Progressive Speedometer Arc (0 - 200 km/h) */
     g_ui.arc_speed_val = lv_arc_create(g_ui.panel_center_speed);
     lv_obj_set_size(g_ui.arc_speed_val, 106, 106);
-    lv_obj_center(g_ui.arc_speed_val);
+    lv_obj_align(g_ui.arc_speed_val, LV_ALIGN_CENTER, 0, -15);
     lv_arc_set_range(g_ui.arc_speed_val, 0, 200);
     lv_arc_set_value(g_ui.arc_speed_val, 73);
     lv_arc_set_bg_angles(g_ui.arc_speed_val, 135, 45); /* 270 degree sweep matching outer dial */
@@ -459,8 +489,8 @@ static void build_cockpit_view(lv_obj_t *parent) {
 
     /* Center Digital Speedometer Hub inside Arc */
     g_ui.hub_speed = lv_obj_create(g_ui.panel_center_speed);
-    lv_obj_set_size(g_ui.hub_speed, 82, 82);
-    lv_obj_center(g_ui.hub_speed);
+    lv_obj_set_size(g_ui.hub_speed, 90, 90);
+    lv_obj_align(g_ui.hub_speed, LV_ALIGN_CENTER, 0, -15);
     lv_obj_set_style_radius(g_ui.hub_speed, LV_RADIUS_CIRCLE, LV_PART_MAIN);
     lv_obj_set_style_bg_color(g_ui.hub_speed, lv_color_hex(0x080B10), LV_PART_MAIN);
     lv_obj_set_style_bg_opa(g_ui.hub_speed, LV_OPA_COVER, LV_PART_MAIN);
@@ -482,23 +512,27 @@ static void build_cockpit_view(lv_obj_t *parent) {
     lv_obj_set_style_text_font(g_ui.lbl_speed_unit, &lv_font_montserrat_12, LV_PART_MAIN);
 
     /* =========================================================================
-     * SECTION 3: Right Clean Digital Telemetry Column (26% Width)
+     * SECTION 3: Right Clean Digital Telemetry Column (28% Width)
      * ========================================================================= */
     g_ui.panel_right_telemetry = lv_obj_create(tri_row);
-    lv_obj_set_size(g_ui.panel_right_telemetry, lv_pct(26), lv_pct(100));
+    lv_obj_set_size(g_ui.panel_right_telemetry, lv_pct(28), lv_pct(100));
     lv_obj_add_style(g_ui.panel_right_telemetry, &g_ui.style_panel_card, LV_PART_MAIN);
     lv_obj_clear_flag(g_ui.panel_right_telemetry, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_set_flex_flow(g_ui.panel_right_telemetry, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(g_ui.panel_right_telemetry, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_obj_set_style_pad_all(g_ui.panel_right_telemetry, 6, LV_PART_MAIN);
+    lv_obj_set_flex_align(g_ui.panel_right_telemetry, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_style_pad_all(g_ui.panel_right_telemetry, 4, LV_PART_MAIN);
 
-    /* 1. COOLANT TEMP */
+    /* 1. COOLANT TEMP CARD */
     lv_obj_t *box_ect = lv_obj_create(g_ui.panel_right_telemetry);
     lv_obj_set_size(box_ect, lv_pct(100), LV_SIZE_CONTENT);
-    lv_obj_set_style_bg_opa(box_ect, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_set_style_border_opa(box_ect, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_set_style_pad_all(box_ect, 0, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(box_ect, lv_color_hex(0x0A0E17), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(box_ect, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(box_ect, COLOR_BORDER_SUBTLE, LV_PART_MAIN);
+    lv_obj_set_style_border_width(box_ect, 1, LV_PART_MAIN);
+    lv_obj_set_style_radius(box_ect, 5, LV_PART_MAIN);
+    lv_obj_set_style_pad_hor(box_ect, 5, LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(box_ect, 3, LV_PART_MAIN);
     lv_obj_clear_flag(box_ect, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(box_ect, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_gap(box_ect, 2, LV_PART_MAIN);
@@ -531,12 +565,16 @@ static void build_cockpit_view(lv_obj_t *parent) {
     lv_obj_set_style_bg_color(g_ui.bar_ect, COLOR_ACCENT_CYAN, LV_PART_INDICATOR);
     lv_obj_set_style_radius(g_ui.bar_ect, 2, LV_PART_INDICATOR);
 
-    /* 2. BOOST */
+    /* 2. BOOST CARD */
     lv_obj_t *box_boost = lv_obj_create(g_ui.panel_right_telemetry);
     lv_obj_set_size(box_boost, lv_pct(100), LV_SIZE_CONTENT);
-    lv_obj_set_style_bg_opa(box_boost, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_set_style_border_opa(box_boost, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_set_style_pad_all(box_boost, 0, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(box_boost, lv_color_hex(0x0A0E17), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(box_boost, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(box_boost, COLOR_BORDER_SUBTLE, LV_PART_MAIN);
+    lv_obj_set_style_border_width(box_boost, 1, LV_PART_MAIN);
+    lv_obj_set_style_radius(box_boost, 5, LV_PART_MAIN);
+    lv_obj_set_style_pad_hor(box_boost, 5, LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(box_boost, 3, LV_PART_MAIN);
     lv_obj_clear_flag(box_boost, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(box_boost, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_gap(box_boost, 2, LV_PART_MAIN);
@@ -569,12 +607,16 @@ static void build_cockpit_view(lv_obj_t *parent) {
     lv_obj_set_style_bg_color(g_ui.bar_boost, COLOR_ACCENT_BLUE, LV_PART_INDICATOR);
     lv_obj_set_style_radius(g_ui.bar_boost, 2, LV_PART_INDICATOR);
 
-    /* 3. BATT */
+    /* 3. BATT CARD */
     lv_obj_t *box_batt = lv_obj_create(g_ui.panel_right_telemetry);
     lv_obj_set_size(box_batt, lv_pct(100), LV_SIZE_CONTENT);
-    lv_obj_set_style_bg_opa(box_batt, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_set_style_border_opa(box_batt, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_set_style_pad_all(box_batt, 0, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(box_batt, lv_color_hex(0x0A0E17), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(box_batt, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(box_batt, COLOR_BORDER_SUBTLE, LV_PART_MAIN);
+    lv_obj_set_style_border_width(box_batt, 1, LV_PART_MAIN);
+    lv_obj_set_style_radius(box_batt, 5, LV_PART_MAIN);
+    lv_obj_set_style_pad_hor(box_batt, 5, LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(box_batt, 3, LV_PART_MAIN);
     lv_obj_clear_flag(box_batt, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(box_batt, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_gap(box_batt, 2, LV_PART_MAIN);
@@ -607,12 +649,16 @@ static void build_cockpit_view(lv_obj_t *parent) {
     lv_obj_set_style_bg_color(g_ui.bar_batt, COLOR_SAFE_GREEN, LV_PART_INDICATOR);
     lv_obj_set_style_radius(g_ui.bar_batt, 2, LV_PART_INDICATOR);
 
-    /* 4. AFR */
+    /* 4. AFR CARD */
     lv_obj_t *box_afr = lv_obj_create(g_ui.panel_right_telemetry);
     lv_obj_set_size(box_afr, lv_pct(100), LV_SIZE_CONTENT);
-    lv_obj_set_style_bg_opa(box_afr, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_set_style_border_opa(box_afr, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_obj_set_style_pad_all(box_afr, 0, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(box_afr, lv_color_hex(0x0A0E17), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(box_afr, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(box_afr, COLOR_BORDER_SUBTLE, LV_PART_MAIN);
+    lv_obj_set_style_border_width(box_afr, 1, LV_PART_MAIN);
+    lv_obj_set_style_radius(box_afr, 5, LV_PART_MAIN);
+    lv_obj_set_style_pad_hor(box_afr, 5, LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(box_afr, 3, LV_PART_MAIN);
     lv_obj_clear_flag(box_afr, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(box_afr, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_pad_gap(box_afr, 2, LV_PART_MAIN);
@@ -680,7 +726,8 @@ static void build_cockpit_view(lv_obj_t *parent) {
 /**
  * @brief Construct Page 2: 4x4 Off-Road Inclinometer View
  */
-static void build_offroad_view(lv_obj_t *parent) {
+static void build_offroad_view(lv_obj_t *parent)
+{
     g_ui.view_offroad = lv_obj_create(parent);
     lv_obj_set_size(g_ui.view_offroad, lv_pct(100), lv_pct(89));
     lv_obj_set_style_bg_opa(g_ui.view_offroad, LV_OPA_TRANSP, LV_PART_MAIN);
@@ -938,36 +985,46 @@ static void build_offroad_view(lv_obj_t *parent) {
     lv_obj_set_style_text_font(g_ui.lbl_offroad_batt, &lv_font_montserrat_12, LV_PART_MAIN);
 }
 
-static void mode_toggle_event_cb(lv_event_t *e) {
-    if (lv_event_get_code(e) == LV_EVENT_CLICKED) {
+static void mode_toggle_event_cb(lv_event_t *e)
+{
+    if (lv_event_get_code(e) == LV_EVENT_CLICKED)
+    {
         obd_dashboard_set_view_mode(!g_ui.is_offroad);
     }
 }
 
-void obd_dashboard_set_view_mode(bool offroad_mode) {
+void obd_dashboard_set_view_mode(bool offroad_mode)
+{
     g_ui.is_offroad = offroad_mode;
-    if (g_ui.is_offroad) {
+    if (g_ui.is_offroad)
+    {
         lv_obj_add_flag(g_ui.view_cockpit, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(g_ui.view_offroad, LV_OBJ_FLAG_HIDDEN);
         lv_label_set_text(g_ui.lbl_mode_toggle, "GAUGE");
-    } else {
+    }
+    else
+    {
         lv_obj_add_flag(g_ui.view_offroad, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(g_ui.view_cockpit, LV_OBJ_FLAG_HIDDEN);
         lv_label_set_text(g_ui.lbl_mode_toggle, "4x4 HUD");
     }
 }
 
-bool obd_dashboard_is_offroad_mode(void) {
+bool obd_dashboard_is_offroad_mode(void)
+{
     return g_ui.is_offroad;
 }
 
 /**
  * @brief Initialize and build the responsive OBD-II Gauge Dashboard UI tree
  */
-lv_obj_t *obd_dashboard_init(lv_obj_t *parent) {
-    if (!parent) {
+lv_obj_t *obd_dashboard_init(lv_obj_t *parent)
+{
+    if (!parent)
+    {
         parent = lv_screen_active();
-        if (!parent) {
+        if (!parent)
+        {
             parent = lv_obj_create(NULL);
             lv_screen_load(parent);
         }
@@ -994,7 +1051,8 @@ lv_obj_t *obd_dashboard_init(lv_obj_t *parent) {
     return g_ui.root_cont;
 }
 
-static const char *get_cardinal_dir(uint16_t deg) {
+static const char *get_cardinal_dir(uint16_t deg)
+{
     static const char *dirs[] = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
     uint8_t idx = (uint8_t)(((deg + 22) % 360) / 45);
     return dirs[idx];
@@ -1003,28 +1061,38 @@ static const char *get_cardinal_dir(uint16_t deg) {
 /* =========================================================================
  * 5. High-Performance Zero-Allocation Telemetry Update
  * ========================================================================= */
-void obd_dashboard_update(const obd2_telemetry_t *data) {
-    if (!data || !g_ui.root_cont) return;
+void obd_dashboard_update(const obd2_telemetry_t *data)
+{
+    if (!data || !g_ui.root_cont)
+        return;
 
     /* 1. Connection Status */
-    if (data->connected != g_telemetry_cache.connected) {
-        if (data->connected) {
+    if (data->connected != g_telemetry_cache.connected)
+    {
+        if (data->connected)
+        {
             lv_label_set_text(g_ui.lbl_conn_status, LV_SYMBOL_OK " OBD-II");
             lv_obj_set_style_text_color(g_ui.lbl_conn_status, COLOR_SAFE_GREEN, LV_PART_MAIN);
-        } else {
+        }
+        else
+        {
             lv_label_set_text(g_ui.lbl_conn_status, LV_SYMBOL_CLOSE " NO LINK");
             lv_obj_set_style_text_color(g_ui.lbl_conn_status, COLOR_ALERT_RED, LV_PART_MAIN);
         }
     }
 
     /* 2. MIL (Check Engine Warning) */
-    if (data->mil_status != g_telemetry_cache.mil_status) {
-        if (data->mil_status) {
+    if (data->mil_status != g_telemetry_cache.mil_status)
+    {
+        if (data->mil_status)
+        {
             lv_label_set_text(g_ui.lbl_mil, "CHECK");
             lv_obj_set_style_text_color(g_ui.lbl_mil, COLOR_ALERT_RED, LV_PART_MAIN);
             lv_obj_set_style_bg_color(g_ui.badge_mil, lv_color_hex(0x3B1214), LV_PART_MAIN);
             lv_obj_set_style_border_color(g_ui.badge_mil, COLOR_ALERT_RED, LV_PART_MAIN);
-        } else {
+        }
+        else
+        {
             lv_label_set_text(g_ui.lbl_mil, "MIL");
             lv_obj_set_style_text_color(g_ui.lbl_mil, COLOR_TEXT_DIM, LV_PART_MAIN);
             lv_obj_set_style_bg_color(g_ui.badge_mil, lv_color_hex(0x181C24), LV_PART_MAIN);
@@ -1033,7 +1101,8 @@ void obd_dashboard_update(const obd2_telemetry_t *data) {
     }
 
     /* 3. Tachometer (RPM Arc & Digital Readout) */
-    if (data->rpm != g_telemetry_cache.rpm) {
+    if (data->rpm != g_telemetry_cache.rpm)
+    {
         uint16_t clamped_rpm = (data->rpm > OBD_RPM_MAX) ? OBD_RPM_MAX : data->rpm;
         lv_arc_set_value(g_ui.arc_rpm_val, clamped_rpm);
 
@@ -1042,22 +1111,28 @@ void obd_dashboard_update(const obd2_telemetry_t *data) {
         snprintf(buf, sizeof(buf), "%.1f", rpm_k);
         lv_label_set_text(g_ui.lbl_rpm_digital, buf);
 
-        if (clamped_rpm >= OBD_RPM_REDLINE) {
+        if (clamped_rpm >= OBD_RPM_REDLINE)
+        {
             lv_obj_set_style_arc_color(g_ui.arc_rpm_val, COLOR_ALERT_RED, LV_PART_INDICATOR);
             lv_obj_set_style_text_color(g_ui.lbl_rpm_digital, COLOR_ALERT_RED, LV_PART_MAIN);
-        } else {
+        }
+        else
+        {
             lv_obj_set_style_arc_color(g_ui.arc_rpm_val, COLOR_ACCENT_CYAN, LV_PART_INDICATOR);
             lv_obj_set_style_text_color(g_ui.lbl_rpm_digital, COLOR_TEXT_PRIMARY, LV_PART_MAIN);
         }
     }
 
     /* 4. Speedometer (Scale Needle, Progressive Arc & Digital Readout) */
-    if (data->speed != g_telemetry_cache.speed) {
+    if (data->speed != g_telemetry_cache.speed)
+    {
         uint16_t clamped_spd = (data->speed > 200) ? 200 : data->speed;
-        if (g_ui.scale_speed && g_ui.needle_speed) {
+        if (g_ui.scale_speed && g_ui.needle_speed)
+        {
             lv_scale_set_line_needle_value(g_ui.scale_speed, g_ui.needle_speed, 72, clamped_spd);
         }
-        if (g_ui.arc_speed_val) {
+        if (g_ui.arc_speed_val)
+        {
             lv_arc_set_value(g_ui.arc_speed_val, clamped_spd);
         }
 
@@ -1070,167 +1145,236 @@ void obd_dashboard_update(const obd2_telemetry_t *data) {
     }
 
     /* 5. Coolant Temperature (ECT) */
-    if (data->coolant_temp != g_telemetry_cache.coolant_temp) {
+    if (data->coolant_temp != g_telemetry_cache.coolant_temp)
+    {
         char buf[16];
         snprintf(buf, sizeof(buf), "%d °C", data->coolant_temp);
         lv_label_set_text(g_ui.lbl_ect_val, buf);
 
         int32_t ect_val = data->coolant_temp;
-        if (ect_val < 40) ect_val = 40;
-        if (ect_val > 120) ect_val = 120;
-        if (g_ui.bar_ect) lv_bar_set_value(g_ui.bar_ect, ect_val, LV_ANIM_OFF);
+        if (ect_val < 40)
+            ect_val = 40;
+        if (ect_val > 120)
+            ect_val = 120;
+        if (g_ui.bar_ect)
+            lv_bar_set_value(g_ui.bar_ect, ect_val, LV_ANIM_OFF);
 
-        if (data->coolant_temp > OBD_COOLANT_OVERHEAT_THRESH) {
+        if (data->coolant_temp > OBD_COOLANT_OVERHEAT_THRESH)
+        {
             lv_obj_set_style_text_color(g_ui.lbl_ect_val, COLOR_ALERT_RED, LV_PART_MAIN);
-            if (g_ui.bar_ect) lv_obj_set_style_bg_color(g_ui.bar_ect, COLOR_ALERT_RED, LV_PART_INDICATOR);
-        } else {
+            if (g_ui.bar_ect)
+                lv_obj_set_style_bg_color(g_ui.bar_ect, COLOR_ALERT_RED, LV_PART_INDICATOR);
+        }
+        else
+        {
             lv_obj_set_style_text_color(g_ui.lbl_ect_val, COLOR_ACCENT_CYAN, LV_PART_MAIN);
-            if (g_ui.bar_ect) lv_obj_set_style_bg_color(g_ui.bar_ect, COLOR_ACCENT_CYAN, LV_PART_INDICATOR);
+            if (g_ui.bar_ect)
+                lv_obj_set_style_bg_color(g_ui.bar_ect, COLOR_ACCENT_CYAN, LV_PART_INDICATOR);
         }
     }
 
     /* 6. Turbo Boost / MAP */
-    if (fabsf(data->map_bar - g_telemetry_cache.map_bar) > 0.01f) {
+    if (fabsf(data->map_bar - g_telemetry_cache.map_bar) > 0.01f)
+    {
         char buf[16];
         snprintf(buf, sizeof(buf), "%.1f BAR", data->map_bar);
         lv_label_set_text(g_ui.lbl_boost_val, buf);
 
         int32_t boost_val = (int32_t)(data->map_bar * 100.0f);
-        if (boost_val < 0) boost_val = 0;
-        if (boost_val > 250) boost_val = 250;
-        if (g_ui.bar_boost) lv_bar_set_value(g_ui.bar_boost, boost_val, LV_ANIM_OFF);
+        if (boost_val < 0)
+            boost_val = 0;
+        if (boost_val > 250)
+            boost_val = 250;
+        if (g_ui.bar_boost)
+            lv_bar_set_value(g_ui.bar_boost, boost_val, LV_ANIM_OFF);
     }
 
     /* 7. Battery Voltage */
-    if (fabsf(data->voltage - g_telemetry_cache.voltage) > 0.05f) {
+    if (fabsf(data->voltage - g_telemetry_cache.voltage) > 0.05f)
+    {
         char buf[16];
         snprintf(buf, sizeof(buf), "%.1f V", data->voltage);
         lv_label_set_text(g_ui.lbl_batt_val, buf);
         lv_label_set_text(g_ui.lbl_offroad_batt, buf);
 
         int32_t batt_val = (int32_t)(data->voltage * 10.0f);
-        if (batt_val < 100) batt_val = 100;
-        if (batt_val > 160) batt_val = 160;
-        if (g_ui.bar_batt) lv_bar_set_value(g_ui.bar_batt, batt_val, LV_ANIM_OFF);
+        if (batt_val < 100)
+            batt_val = 100;
+        if (batt_val > 160)
+            batt_val = 160;
+        if (g_ui.bar_batt)
+            lv_bar_set_value(g_ui.bar_batt, batt_val, LV_ANIM_OFF);
 
-        if (data->voltage < OBD_VOLTAGE_LOW_THRESH || data->voltage > OBD_VOLTAGE_HIGH_THRESH) {
+        if (data->voltage < OBD_VOLTAGE_LOW_THRESH || data->voltage > OBD_VOLTAGE_HIGH_THRESH)
+        {
             lv_obj_set_style_text_color(g_ui.lbl_batt_val, COLOR_WARN_AMBER, LV_PART_MAIN);
-            if (g_ui.bar_batt) lv_obj_set_style_bg_color(g_ui.bar_batt, COLOR_WARN_AMBER, LV_PART_INDICATOR);
-        } else {
+            if (g_ui.bar_batt)
+                lv_obj_set_style_bg_color(g_ui.bar_batt, COLOR_WARN_AMBER, LV_PART_INDICATOR);
+        }
+        else
+        {
             lv_obj_set_style_text_color(g_ui.lbl_batt_val, COLOR_SAFE_GREEN, LV_PART_MAIN);
-            if (g_ui.bar_batt) lv_obj_set_style_bg_color(g_ui.bar_batt, COLOR_SAFE_GREEN, LV_PART_INDICATOR);
+            if (g_ui.bar_batt)
+                lv_obj_set_style_bg_color(g_ui.bar_batt, COLOR_SAFE_GREEN, LV_PART_INDICATOR);
         }
     }
 
     /* 8. Air-Fuel Ratio (AFR) */
-    if (fabsf(data->afr - g_telemetry_cache.afr) > 0.05f) {
+    if (fabsf(data->afr - g_telemetry_cache.afr) > 0.05f)
+    {
         char buf[16];
         snprintf(buf, sizeof(buf), "%.1f", data->afr);
         lv_label_set_text(g_ui.lbl_afr_val, buf);
 
         int32_t afr_val = (int32_t)(data->afr * 10.0f);
-        if (afr_val < 100) afr_val = 100;
-        if (afr_val > 200) afr_val = 200;
-        if (g_ui.bar_afr) lv_bar_set_value(g_ui.bar_afr, afr_val, LV_ANIM_OFF);
+        if (afr_val < 100)
+            afr_val = 100;
+        if (afr_val > 200)
+            afr_val = 200;
+        if (g_ui.bar_afr)
+            lv_bar_set_value(g_ui.bar_afr, afr_val, LV_ANIM_OFF);
     }
 
     /* 9. Fuel Level */
-    if (data->fuel_pct != g_telemetry_cache.fuel_pct) {
+    if (data->fuel_pct != g_telemetry_cache.fuel_pct)
+    {
         char buf[16];
-        if (data->fuel_pct >= 85) snprintf(buf, sizeof(buf), LV_SYMBOL_TINT " 7/8");
-        else if (data->fuel_pct >= 60) snprintf(buf, sizeof(buf), LV_SYMBOL_TINT " 3/4");
-        else if (data->fuel_pct >= 40) snprintf(buf, sizeof(buf), LV_SYMBOL_TINT " 1/2");
-        else if (data->fuel_pct >= 20) snprintf(buf, sizeof(buf), LV_SYMBOL_TINT " 1/4");
-        else snprintf(buf, sizeof(buf), LV_SYMBOL_WARNING " LOW");
+        if (data->fuel_pct >= 85)
+            snprintf(buf, sizeof(buf), LV_SYMBOL_TINT " 7/8");
+        else if (data->fuel_pct >= 60)
+            snprintf(buf, sizeof(buf), LV_SYMBOL_TINT " 3/4");
+        else if (data->fuel_pct >= 40)
+            snprintf(buf, sizeof(buf), LV_SYMBOL_TINT " 1/2");
+        else if (data->fuel_pct >= 20)
+            snprintf(buf, sizeof(buf), LV_SYMBOL_TINT " 1/4");
+        else
+            snprintf(buf, sizeof(buf), LV_SYMBOL_WARNING " LOW");
         lv_label_set_text(g_ui.lbl_fuel_val, buf);
     }
 
     /* 10. 4x4 Off-Road Inclinometer: ROLL Angle */
-    if (fabsf(data->roll_deg - g_telemetry_cache.roll_deg) > 0.2f) {
+    if (fabsf(data->roll_deg - g_telemetry_cache.roll_deg) > 0.2f)
+    {
         float roll = data->roll_deg;
-        if (roll < -45.0f) roll = -45.0f;
-        if (roll > 45.0f) roll = 45.0f;
+        if (roll < -45.0f)
+            roll = -45.0f;
+        if (roll > 45.0f)
+            roll = 45.0f;
 
-        if (g_ui.scale_roll && g_ui.needle_roll) {
+        if (g_ui.scale_roll && g_ui.needle_roll)
+        {
             lv_scale_set_line_needle_value(g_ui.scale_roll, g_ui.needle_roll, 68, (int32_t)roll);
         }
-        if (g_ui.arc_roll_val) {
+        if (g_ui.arc_roll_val)
+        {
             lv_arc_set_value(g_ui.arc_roll_val, (int32_t)roll);
         }
 
         /* Dynamically rotate Suzuki Jimny JB74 Front Silhouette & Grille */
-        if (g_ui.line_car_roll) {
+        if (g_ui.line_car_roll)
+        {
             rotate_vector_points(g_base_car_front, g_ui.pts_car_roll, CAR_FRONT_PTS_COUNT, roll, 47, 24);
             lv_line_set_points(g_ui.line_car_roll, g_ui.pts_car_roll, CAR_FRONT_PTS_COUNT);
         }
-        if (g_ui.line_grille_roll) {
+        if (g_ui.line_grille_roll)
+        {
             rotate_vector_points(g_base_car_grille, g_ui.pts_grille_roll, CAR_GRILLE_PTS_COUNT, roll, 47, 24);
             lv_line_set_points(g_ui.line_grille_roll, g_ui.pts_grille_roll, CAR_GRILLE_PTS_COUNT);
         }
 
         char buf[32];
-        if (fabsf(roll) < 1.0f) {
+        if (fabsf(roll) < 1.0f)
+        {
             snprintf(buf, sizeof(buf), "0° LEVEL");
-        } else if (roll > 0) {
+        }
+        else if (roll > 0)
+        {
             snprintf(buf, sizeof(buf), "R %.0f° " LV_SYMBOL_RIGHT, roll);
-        } else {
+        }
+        else
+        {
             snprintf(buf, sizeof(buf), LV_SYMBOL_LEFT " L %.0f°", fabsf(roll));
         }
         lv_label_set_text(g_ui.lbl_roll_val, buf);
 
         float abs_roll = fabsf(roll);
-        if (abs_roll >= OFFROAD_ROLL_DANGER_THRESH) {
+        if (abs_roll >= OFFROAD_ROLL_DANGER_THRESH)
+        {
             lv_obj_set_style_text_color(g_ui.lbl_roll_val, COLOR_ALERT_RED, LV_PART_MAIN);
             lv_label_set_text(g_ui.lbl_roll_status, LV_SYMBOL_WARNING " ROLLOVER");
             lv_obj_set_style_text_color(g_ui.lbl_roll_status, COLOR_ALERT_RED, LV_PART_MAIN);
             lv_obj_set_style_border_color(g_ui.card_roll, COLOR_ALERT_RED, LV_PART_MAIN);
-            if (g_ui.arc_roll_val) lv_obj_set_style_arc_color(g_ui.arc_roll_val, COLOR_ALERT_RED, LV_PART_INDICATOR);
-            if (g_ui.line_car_roll) lv_obj_set_style_line_color(g_ui.line_car_roll, COLOR_ALERT_RED, LV_PART_MAIN);
-            if (g_ui.line_grille_roll) lv_obj_set_style_line_color(g_ui.line_grille_roll, COLOR_ALERT_RED, LV_PART_MAIN);
-        } else if (abs_roll >= OFFROAD_ROLL_WARN_THRESH) {
+            if (g_ui.arc_roll_val)
+                lv_obj_set_style_arc_color(g_ui.arc_roll_val, COLOR_ALERT_RED, LV_PART_INDICATOR);
+            if (g_ui.line_car_roll)
+                lv_obj_set_style_line_color(g_ui.line_car_roll, COLOR_ALERT_RED, LV_PART_MAIN);
+            if (g_ui.line_grille_roll)
+                lv_obj_set_style_line_color(g_ui.line_grille_roll, COLOR_ALERT_RED, LV_PART_MAIN);
+        }
+        else if (abs_roll >= OFFROAD_ROLL_WARN_THRESH)
+        {
             lv_obj_set_style_text_color(g_ui.lbl_roll_val, COLOR_WARN_AMBER, LV_PART_MAIN);
             lv_label_set_text(g_ui.lbl_roll_status, LV_SYMBOL_WARNING " CAUTION");
             lv_obj_set_style_text_color(g_ui.lbl_roll_status, COLOR_WARN_AMBER, LV_PART_MAIN);
             lv_obj_set_style_border_color(g_ui.card_roll, COLOR_WARN_AMBER, LV_PART_MAIN);
-            if (g_ui.arc_roll_val) lv_obj_set_style_arc_color(g_ui.arc_roll_val, COLOR_WARN_AMBER, LV_PART_INDICATOR);
-            if (g_ui.line_car_roll) lv_obj_set_style_line_color(g_ui.line_car_roll, COLOR_WARN_AMBER, LV_PART_MAIN);
-            if (g_ui.line_grille_roll) lv_obj_set_style_line_color(g_ui.line_grille_roll, COLOR_WARN_AMBER, LV_PART_MAIN);
-        } else {
+            if (g_ui.arc_roll_val)
+                lv_obj_set_style_arc_color(g_ui.arc_roll_val, COLOR_WARN_AMBER, LV_PART_INDICATOR);
+            if (g_ui.line_car_roll)
+                lv_obj_set_style_line_color(g_ui.line_car_roll, COLOR_WARN_AMBER, LV_PART_MAIN);
+            if (g_ui.line_grille_roll)
+                lv_obj_set_style_line_color(g_ui.line_grille_roll, COLOR_WARN_AMBER, LV_PART_MAIN);
+        }
+        else
+        {
             lv_obj_set_style_text_color(g_ui.lbl_roll_val, COLOR_TEXT_PRIMARY, LV_PART_MAIN);
             lv_label_set_text(g_ui.lbl_roll_status, LV_SYMBOL_OK " STABLE");
             lv_obj_set_style_text_color(g_ui.lbl_roll_status, COLOR_SAFE_GREEN, LV_PART_MAIN);
             lv_obj_set_style_border_color(g_ui.card_roll, COLOR_BORDER_SUBTLE, LV_PART_MAIN);
-            if (g_ui.arc_roll_val) lv_obj_set_style_arc_color(g_ui.arc_roll_val, COLOR_ACCENT_CYAN, LV_PART_INDICATOR);
-            if (g_ui.line_car_roll) lv_obj_set_style_line_color(g_ui.line_car_roll, COLOR_ACCENT_CYAN, LV_PART_MAIN);
-            if (g_ui.line_grille_roll) lv_obj_set_style_line_color(g_ui.line_grille_roll, COLOR_ACCENT_CYAN, LV_PART_MAIN);
+            if (g_ui.arc_roll_val)
+                lv_obj_set_style_arc_color(g_ui.arc_roll_val, COLOR_ACCENT_CYAN, LV_PART_INDICATOR);
+            if (g_ui.line_car_roll)
+                lv_obj_set_style_line_color(g_ui.line_car_roll, COLOR_ACCENT_CYAN, LV_PART_MAIN);
+            if (g_ui.line_grille_roll)
+                lv_obj_set_style_line_color(g_ui.line_grille_roll, COLOR_ACCENT_CYAN, LV_PART_MAIN);
         }
     }
 
     /* 11. 4x4 Off-Road Inclinometer: PITCH Angle */
-    if (fabsf(data->pitch_deg - g_telemetry_cache.pitch_deg) > 0.2f) {
+    if (fabsf(data->pitch_deg - g_telemetry_cache.pitch_deg) > 0.2f)
+    {
         float pitch = data->pitch_deg;
-        if (pitch < -45.0f) pitch = -45.0f;
-        if (pitch > 45.0f) pitch = 45.0f;
+        if (pitch < -45.0f)
+            pitch = -45.0f;
+        if (pitch > 45.0f)
+            pitch = 45.0f;
 
-        if (g_ui.scale_pitch && g_ui.needle_pitch) {
+        if (g_ui.scale_pitch && g_ui.needle_pitch)
+        {
             lv_scale_set_line_needle_value(g_ui.scale_pitch, g_ui.needle_pitch, 68, (int32_t)pitch);
         }
-        if (g_ui.arc_pitch_val) {
+        if (g_ui.arc_pitch_val)
+        {
             lv_arc_set_value(g_ui.arc_pitch_val, (int32_t)pitch);
         }
 
         /* Dynamically rotate 4x4 Side Profile Silhouette */
-        if (g_ui.line_car_pitch) {
+        if (g_ui.line_car_pitch)
+        {
             rotate_vector_points(g_base_car_side, g_ui.pts_car_pitch, CAR_SIDE_PTS_COUNT, pitch, 47, 24);
             lv_line_set_points(g_ui.line_car_pitch, g_ui.pts_car_pitch, CAR_SIDE_PTS_COUNT);
         }
 
         char buf[32];
-        if (fabsf(pitch) < 1.0f) {
+        if (fabsf(pitch) < 1.0f)
+        {
             snprintf(buf, sizeof(buf), "0° LEVEL");
-        } else if (pitch > 0) {
+        }
+        else if (pitch > 0)
+        {
             snprintf(buf, sizeof(buf), LV_SYMBOL_UP " UP +%.0f°", pitch);
-        } else {
+        }
+        else
+        {
             snprintf(buf, sizeof(buf), LV_SYMBOL_DOWN " DN %.0f°", pitch);
         }
         lv_label_set_text(g_ui.lbl_pitch_val, buf);
@@ -1240,33 +1384,46 @@ void obd_dashboard_update(const obd2_telemetry_t *data) {
         lv_label_set_text(g_ui.lbl_pitch_grade, buf);
 
         float abs_pitch = fabsf(pitch);
-        if (abs_pitch >= OFFROAD_PITCH_DANGER_THRESH) {
+        if (abs_pitch >= OFFROAD_PITCH_DANGER_THRESH)
+        {
             lv_obj_set_style_text_color(g_ui.lbl_pitch_val, COLOR_ALERT_RED, LV_PART_MAIN);
             lv_obj_set_style_border_color(g_ui.card_pitch, COLOR_ALERT_RED, LV_PART_MAIN);
-            if (g_ui.arc_pitch_val) lv_obj_set_style_arc_color(g_ui.arc_pitch_val, COLOR_ALERT_RED, LV_PART_INDICATOR);
-            if (g_ui.line_car_pitch) lv_obj_set_style_line_color(g_ui.line_car_pitch, COLOR_ALERT_RED, LV_PART_MAIN);
-        } else if (abs_pitch >= OFFROAD_PITCH_WARN_THRESH) {
+            if (g_ui.arc_pitch_val)
+                lv_obj_set_style_arc_color(g_ui.arc_pitch_val, COLOR_ALERT_RED, LV_PART_INDICATOR);
+            if (g_ui.line_car_pitch)
+                lv_obj_set_style_line_color(g_ui.line_car_pitch, COLOR_ALERT_RED, LV_PART_MAIN);
+        }
+        else if (abs_pitch >= OFFROAD_PITCH_WARN_THRESH)
+        {
             lv_obj_set_style_text_color(g_ui.lbl_pitch_val, COLOR_WARN_AMBER, LV_PART_MAIN);
             lv_obj_set_style_border_color(g_ui.card_pitch, COLOR_WARN_AMBER, LV_PART_MAIN);
-            if (g_ui.arc_pitch_val) lv_obj_set_style_arc_color(g_ui.arc_pitch_val, COLOR_WARN_AMBER, LV_PART_INDICATOR);
-            if (g_ui.line_car_pitch) lv_obj_set_style_line_color(g_ui.line_car_pitch, COLOR_WARN_AMBER, LV_PART_MAIN);
-        } else {
+            if (g_ui.arc_pitch_val)
+                lv_obj_set_style_arc_color(g_ui.arc_pitch_val, COLOR_WARN_AMBER, LV_PART_INDICATOR);
+            if (g_ui.line_car_pitch)
+                lv_obj_set_style_line_color(g_ui.line_car_pitch, COLOR_WARN_AMBER, LV_PART_MAIN);
+        }
+        else
+        {
             lv_obj_set_style_text_color(g_ui.lbl_pitch_val, COLOR_TEXT_PRIMARY, LV_PART_MAIN);
             lv_obj_set_style_border_color(g_ui.card_pitch, COLOR_BORDER_SUBTLE, LV_PART_MAIN);
-            if (g_ui.arc_pitch_val) lv_obj_set_style_arc_color(g_ui.arc_pitch_val, COLOR_ACCENT_BLUE, LV_PART_INDICATOR);
-            if (g_ui.line_car_pitch) lv_obj_set_style_line_color(g_ui.line_car_pitch, COLOR_ACCENT_BLUE, LV_PART_MAIN);
+            if (g_ui.arc_pitch_val)
+                lv_obj_set_style_arc_color(g_ui.arc_pitch_val, COLOR_ACCENT_BLUE, LV_PART_INDICATOR);
+            if (g_ui.line_car_pitch)
+                lv_obj_set_style_line_color(g_ui.line_car_pitch, COLOR_ACCENT_BLUE, LV_PART_MAIN);
         }
     }
 
     /* 12. Compass Heading & Altitude */
-    if (data->heading_deg != g_telemetry_cache.heading_deg) {
+    if (data->heading_deg != g_telemetry_cache.heading_deg)
+    {
         char buf[32];
-        snprintf(buf, sizeof(buf), "HDG: %u° %s", 
+        snprintf(buf, sizeof(buf), "HDG: %u° %s",
                  data->heading_deg, get_cardinal_dir(data->heading_deg));
         lv_label_set_text(g_ui.lbl_heading_val, buf);
     }
 
-    if (fabsf(data->altitude_m - g_telemetry_cache.altitude_m) > 1.0f) {
+    if (fabsf(data->altitude_m - g_telemetry_cache.altitude_m) > 1.0f)
+    {
         char buf[32];
         snprintf(buf, sizeof(buf), "ALT: %.0f m", data->altitude_m);
         lv_label_set_text(g_ui.lbl_altitude_val, buf);
@@ -1275,43 +1432,56 @@ void obd_dashboard_update(const obd2_telemetry_t *data) {
     g_telemetry_cache = *data;
 }
 
-const obd2_telemetry_t *obd_dashboard_get_current_data(void) {
+const obd2_telemetry_t *obd_dashboard_get_current_data(void)
+{
     return &g_telemetry_cache;
 }
 
 /* =========================================================================
  * 6. Dynamic Mock Telemetry Simulator Task
  * ========================================================================= */
-static void mock_sim_timer_cb(lv_timer_t *timer) {
+static void mock_sim_timer_cb(lv_timer_t *timer)
+{
     static uint32_t sim_tick = 0;
-    static uint8_t  gear = 1;
-    static float    sim_rpm = 1000.0f;
-    static float    sim_speed = 0.0f;
-    static float    sim_coolant = 88.0f;
-    static bool     accelerating = true;
+    static uint8_t gear = 1;
+    static float sim_rpm = 1000.0f;
+    static float sim_speed = 0.0f;
+    static float sim_coolant = 88.0f;
+    static bool accelerating = true;
 
     sim_tick++;
 
-    if (accelerating) {
+    if (accelerating)
+    {
         sim_rpm += 100.0f;
         sim_speed += (0.55f * (float)gear);
 
-        if (sim_rpm >= 6200.0f) {
-            if (gear < 5) {
+        if (sim_rpm >= 6200.0f)
+        {
+            if (gear < 5)
+            {
                 gear++;
                 sim_rpm = 3200.0f;
-            } else {
+            }
+            else
+            {
                 accelerating = false;
             }
         }
-    } else {
+    }
+    else
+    {
         sim_rpm -= 130.0f;
         sim_speed -= 0.75f;
-        if (sim_rpm <= 1800.0f) {
-            if (gear > 1) {
+        if (sim_rpm <= 1800.0f)
+        {
+            if (gear > 1)
+            {
                 gear--;
                 sim_rpm = 3600.0f;
-            } else {
+            }
+            else
+            {
                 sim_rpm = 1000.0f;
                 sim_speed = 0.0f;
                 accelerating = true;
@@ -1320,7 +1490,8 @@ static void mock_sim_timer_cb(lv_timer_t *timer) {
     }
 
     uint8_t tps = accelerating ? (uint8_t)(25 + (sim_rpm / 130.0f)) : 5;
-    if (tps > 100) tps = 100;
+    if (tps > 100)
+        tps = 100;
 
     /* Turbo Boost (0.2 to 1.4 BAR under load) */
     float boost = 0.2f + ((float)tps / 100.0f) * 1.2f;
@@ -1329,51 +1500,59 @@ static void mock_sim_timer_cb(lv_timer_t *timer) {
     float afr = accelerating ? (14.7f - ((float)tps / 100.0f) * 2.2f) : 15.5f;
 
     static bool cooling_fan_on = false;
-    if (!cooling_fan_on) {
+    if (!cooling_fan_on)
+    {
         sim_coolant += 0.03f;
-        if (sim_coolant >= 101.5f) cooling_fan_on = true;
-    } else {
+        if (sim_coolant >= 101.5f)
+            cooling_fan_on = true;
+    }
+    else
+    {
         sim_coolant -= 0.05f;
-        if (sim_coolant <= 89.0f) cooling_fan_on = false;
+        if (sim_coolant <= 89.0f)
+            cooling_fan_on = false;
     }
 
     float volt = 14.15f + 0.12f * sinf((float)sim_tick * 0.1f);
     bool mil = ((sim_tick / 200) % 2 == 1);
 
     /* 4x4 Offroad Simulation */
-    float sim_roll  = 22.0f * sinf((float)sim_tick * 0.035f) + 10.0f * sinf((float)sim_tick * 0.08f);
+    float sim_roll = 22.0f * sinf((float)sim_tick * 0.035f) + 10.0f * sinf((float)sim_tick * 0.08f);
     float sim_pitch = 26.0f * cosf((float)sim_tick * 0.025f) + 6.0f * sinf((float)sim_tick * 0.06f);
-    float sim_alt   = 850.0f + 350.0f * sinf((float)sim_tick * 0.01f);
+    float sim_alt = 850.0f + 350.0f * sinf((float)sim_tick * 0.01f);
     uint16_t sim_hdg = (uint16_t)((sim_tick * 2) % 360);
 
     obd2_telemetry_t packet = {
-        .rpm          = (uint16_t)sim_rpm,
-        .speed        = (uint8_t)sim_speed,
+        .rpm = (uint16_t)sim_rpm,
+        .speed = (uint8_t)sim_speed,
         .coolant_temp = (int16_t)sim_coolant,
-        .map_bar      = boost,
-        .tps_pct      = tps,
-        .voltage      = volt,
-        .afr          = afr,
-        .fuel_pct     = 88,
-        .mil_status   = mil,
-        .connected    = true,
-        .pitch_deg    = sim_pitch,
-        .roll_deg     = sim_roll,
-        .altitude_m   = sim_alt,
-        .heading_deg  = sim_hdg
-    };
+        .map_bar = boost,
+        .tps_pct = tps,
+        .voltage = volt,
+        .afr = afr,
+        .fuel_pct = 88,
+        .mil_status = mil,
+        .connected = true,
+        .pitch_deg = sim_pitch,
+        .roll_deg = sim_roll,
+        .altitude_m = sim_alt,
+        .heading_deg = sim_hdg};
 
     obd_dashboard_update(&packet);
 }
 
-void obd_dashboard_start_mock_simulation(uint32_t interval_ms) {
-    if (!g_mock_timer) {
+void obd_dashboard_start_mock_simulation(uint32_t interval_ms)
+{
+    if (!g_mock_timer)
+    {
         g_mock_timer = lv_timer_create(mock_sim_timer_cb, interval_ms, NULL);
     }
 }
 
-void obd_dashboard_stop_mock_simulation(void) {
-    if (g_mock_timer) {
+void obd_dashboard_stop_mock_simulation(void)
+{
+    if (g_mock_timer)
+    {
         lv_timer_delete(g_mock_timer);
         g_mock_timer = NULL;
     }
