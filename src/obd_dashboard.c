@@ -438,7 +438,7 @@ static void build_cockpit_view(lv_obj_t *parent) {
 
     /* Center Progressive Speedometer Arc (0 - 200 km/h) */
     g_ui.arc_speed_val = lv_arc_create(g_ui.panel_center_speed);
-    lv_obj_set_size(g_ui.arc_speed_val, 134, 134);
+    lv_obj_set_size(g_ui.arc_speed_val, 106, 106);
     lv_obj_center(g_ui.arc_speed_val);
     lv_arc_set_range(g_ui.arc_speed_val, 0, 200);
     lv_arc_set_value(g_ui.arc_speed_val, 73);
@@ -446,11 +446,11 @@ static void build_cockpit_view(lv_obj_t *parent) {
     lv_arc_set_rotation(g_ui.arc_speed_val, 0);
 
     lv_obj_set_style_arc_color(g_ui.arc_speed_val, lv_color_hex(0x131A26), LV_PART_MAIN);
-    lv_obj_set_style_arc_width(g_ui.arc_speed_val, 8, LV_PART_MAIN);
+    lv_obj_set_style_arc_width(g_ui.arc_speed_val, 6, LV_PART_MAIN);
     lv_obj_set_style_arc_rounded(g_ui.arc_speed_val, true, LV_PART_MAIN);
 
     lv_obj_set_style_arc_color(g_ui.arc_speed_val, COLOR_ALERT_RED, LV_PART_INDICATOR);
-    lv_obj_set_style_arc_width(g_ui.arc_speed_val, 8, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(g_ui.arc_speed_val, 6, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(g_ui.arc_speed_val, true, LV_PART_INDICATOR);
 
     lv_obj_remove_style(g_ui.arc_speed_val, NULL, LV_PART_KNOB);
@@ -459,7 +459,7 @@ static void build_cockpit_view(lv_obj_t *parent) {
 
     /* Center Digital Speedometer Hub inside Arc */
     g_ui.hub_speed = lv_obj_create(g_ui.panel_center_speed);
-    lv_obj_set_size(g_ui.hub_speed, 88, 88);
+    lv_obj_set_size(g_ui.hub_speed, 82, 82);
     lv_obj_center(g_ui.hub_speed);
     lv_obj_set_style_radius(g_ui.hub_speed, LV_RADIUS_CIRCLE, LV_PART_MAIN);
     lv_obj_set_style_bg_color(g_ui.hub_speed, lv_color_hex(0x080B10), LV_PART_MAIN);
@@ -474,7 +474,7 @@ static void build_cockpit_view(lv_obj_t *parent) {
     g_ui.lbl_speed_val = lv_label_create(g_ui.hub_speed);
     lv_label_set_text(g_ui.lbl_speed_val, "73");
     lv_obj_set_style_text_color(g_ui.lbl_speed_val, COLOR_TEXT_PRIMARY, LV_PART_MAIN);
-    lv_obj_set_style_text_font(g_ui.lbl_speed_val, &lv_font_montserrat_36, LV_PART_MAIN);
+    lv_obj_set_style_text_font(g_ui.lbl_speed_val, &lv_font_montserrat_32, LV_PART_MAIN);
 
     g_ui.lbl_speed_unit = lv_label_create(g_ui.hub_speed);
     lv_label_set_text(g_ui.lbl_speed_unit, "km/h");
@@ -740,7 +740,7 @@ static void build_offroad_view(lv_obj_t *parent) {
 
     /* Center Progressive Inclinometer Roll Arc (-45° to +45°) */
     g_ui.arc_roll_val = lv_arc_create(g_ui.card_roll);
-    lv_obj_set_size(g_ui.arc_roll_val, 134, 134);
+    lv_obj_set_size(g_ui.arc_roll_val, 118, 118);
     lv_obj_center(g_ui.arc_roll_val);
     lv_arc_set_mode(g_ui.arc_roll_val, LV_ARC_MODE_SYMMETRICAL);
     lv_arc_set_range(g_ui.arc_roll_val, -45, 45);
@@ -749,11 +749,11 @@ static void build_offroad_view(lv_obj_t *parent) {
     lv_arc_set_rotation(g_ui.arc_roll_val, 0);
 
     lv_obj_set_style_arc_color(g_ui.arc_roll_val, lv_color_hex(0x131A26), LV_PART_MAIN);
-    lv_obj_set_style_arc_width(g_ui.arc_roll_val, 8, LV_PART_MAIN);
+    lv_obj_set_style_arc_width(g_ui.arc_roll_val, 6, LV_PART_MAIN);
     lv_obj_set_style_arc_rounded(g_ui.arc_roll_val, true, LV_PART_MAIN);
 
     lv_obj_set_style_arc_color(g_ui.arc_roll_val, COLOR_ACCENT_CYAN, LV_PART_INDICATOR);
-    lv_obj_set_style_arc_width(g_ui.arc_roll_val, 8, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(g_ui.arc_roll_val, 6, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(g_ui.arc_roll_val, true, LV_PART_INDICATOR);
 
     lv_obj_remove_style(g_ui.arc_roll_val, NULL, LV_PART_KNOB);
@@ -844,7 +844,7 @@ static void build_offroad_view(lv_obj_t *parent) {
 
     /* Center Progressive Inclinometer Pitch Arc (-45° to +45°) */
     g_ui.arc_pitch_val = lv_arc_create(g_ui.card_pitch);
-    lv_obj_set_size(g_ui.arc_pitch_val, 134, 134);
+    lv_obj_set_size(g_ui.arc_pitch_val, 118, 118);
     lv_obj_center(g_ui.arc_pitch_val);
     lv_arc_set_mode(g_ui.arc_pitch_val, LV_ARC_MODE_SYMMETRICAL);
     lv_arc_set_range(g_ui.arc_pitch_val, -45, 45);
@@ -853,11 +853,11 @@ static void build_offroad_view(lv_obj_t *parent) {
     lv_arc_set_rotation(g_ui.arc_pitch_val, 0);
 
     lv_obj_set_style_arc_color(g_ui.arc_pitch_val, lv_color_hex(0x131A26), LV_PART_MAIN);
-    lv_obj_set_style_arc_width(g_ui.arc_pitch_val, 8, LV_PART_MAIN);
+    lv_obj_set_style_arc_width(g_ui.arc_pitch_val, 6, LV_PART_MAIN);
     lv_obj_set_style_arc_rounded(g_ui.arc_pitch_val, true, LV_PART_MAIN);
 
     lv_obj_set_style_arc_color(g_ui.arc_pitch_val, COLOR_ACCENT_BLUE, LV_PART_INDICATOR);
-    lv_obj_set_style_arc_width(g_ui.arc_pitch_val, 8, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_width(g_ui.arc_pitch_val, 6, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(g_ui.arc_pitch_val, true, LV_PART_INDICATOR);
 
     lv_obj_remove_style(g_ui.arc_pitch_val, NULL, LV_PART_KNOB);
