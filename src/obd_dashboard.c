@@ -224,7 +224,7 @@ static void rotate_vector_points(const lv_point_precise_t *src, lv_point_precise
 
 /* Scale Label Strings */
 static const char *g_speed_labels[] = {"0", "20", "40", "60", "80", "100", "120", "140", "160", "180", "200", NULL};
-static const char *g_incline_labels[] = {"-40", "-20", "0", "+20", "+40", NULL};
+static const char *g_incline_labels[] = {"-45", "-30", "-15", "0", "+15", "+30", "+45", NULL};
 
 static void mode_toggle_event_cb(lv_event_t *e);
 
@@ -269,13 +269,13 @@ static void obd_styles_init(void)
 static void build_status_bar(lv_obj_t *parent)
 {
     g_ui.status_bar = lv_obj_create(parent);
-    lv_obj_set_size(g_ui.status_bar, lv_pct(100), 26);
+    lv_obj_set_size(g_ui.status_bar, lv_pct(100), 32);
     lv_obj_set_style_bg_color(g_ui.status_bar, lv_color_hex(0x0A0D13), LV_PART_MAIN);
     lv_obj_set_style_border_color(g_ui.status_bar, COLOR_BORDER_SUBTLE, LV_PART_MAIN);
     lv_obj_set_style_border_width(g_ui.status_bar, 1, LV_PART_MAIN);
-    lv_obj_set_style_radius(g_ui.status_bar, 5, LV_PART_MAIN);
-    lv_obj_set_style_pad_hor(g_ui.status_bar, 8, LV_PART_MAIN);
-    lv_obj_set_style_pad_ver(g_ui.status_bar, 1, LV_PART_MAIN);
+    lv_obj_set_style_radius(g_ui.status_bar, 6, LV_PART_MAIN);
+    lv_obj_set_style_pad_hor(g_ui.status_bar, 10, LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(g_ui.status_bar, 3, LV_PART_MAIN);
     lv_obj_clear_flag(g_ui.status_bar, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_set_flex_flow(g_ui.status_bar, LV_FLEX_FLOW_ROW);
@@ -285,27 +285,27 @@ static void build_status_bar(lv_obj_t *parent)
     g_ui.lbl_conn_status = lv_label_create(g_ui.status_bar);
     lv_label_set_text(g_ui.lbl_conn_status, LV_SYMBOL_OK " OBD-II");
     lv_obj_set_style_text_color(g_ui.lbl_conn_status, COLOR_SAFE_GREEN, LV_PART_MAIN);
-    lv_obj_set_style_text_font(g_ui.lbl_conn_status, &lv_font_montserrat_12, LV_PART_MAIN);
+    lv_obj_set_style_text_font(g_ui.lbl_conn_status, &lv_font_montserrat_14, LV_PART_MAIN);
 
     /* 2. Top Center Brand Tag */
     g_ui.lbl_brand_title = lv_label_create(g_ui.status_bar);
     lv_label_set_text(g_ui.lbl_brand_title, "PKS SMART GAUGE");
     lv_obj_set_style_text_color(g_ui.lbl_brand_title, COLOR_TEXT_MUTED, LV_PART_MAIN);
-    lv_obj_set_style_text_font(g_ui.lbl_brand_title, &lv_font_montserrat_12, LV_PART_MAIN);
+    lv_obj_set_style_text_font(g_ui.lbl_brand_title, &lv_font_montserrat_14, LV_PART_MAIN);
 
     /* 3. Right: View Toggle Button & MIL Badge */
     lv_obj_t *r_box = lv_obj_create(g_ui.status_bar);
-    lv_obj_set_size(r_box, LV_SIZE_CONTENT, 22);
+    lv_obj_set_size(r_box, LV_SIZE_CONTENT, 26);
     lv_obj_set_style_bg_opa(r_box, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_set_style_border_opa(r_box, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_set_style_pad_all(r_box, 0, LV_PART_MAIN);
-    lv_obj_set_style_pad_gap(r_box, 6, LV_PART_MAIN);
+    lv_obj_set_style_pad_gap(r_box, 8, LV_PART_MAIN);
     lv_obj_clear_flag(r_box, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(r_box, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(r_box, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     g_ui.btn_mode_toggle = lv_button_create(r_box);
-    lv_obj_set_size(g_ui.btn_mode_toggle, 90, 20);
+    lv_obj_set_size(g_ui.btn_mode_toggle, 96, 24);
     lv_obj_set_style_bg_color(g_ui.btn_mode_toggle, lv_color_hex(0x1F2937), LV_PART_MAIN);
     lv_obj_set_style_border_color(g_ui.btn_mode_toggle, COLOR_ACCENT_CYAN, LV_PART_MAIN);
     lv_obj_set_style_border_width(g_ui.btn_mode_toggle, 1, LV_PART_MAIN);
@@ -320,13 +320,13 @@ static void build_status_bar(lv_obj_t *parent)
     lv_obj_center(g_ui.lbl_mode_toggle);
 
     g_ui.badge_mil = lv_obj_create(r_box);
-    lv_obj_set_size(g_ui.badge_mil, LV_SIZE_CONTENT, 20);
+    lv_obj_set_size(g_ui.badge_mil, LV_SIZE_CONTENT, 24);
     lv_obj_set_style_bg_color(g_ui.badge_mil, lv_color_hex(0x181C24), LV_PART_MAIN);
     lv_obj_set_style_border_color(g_ui.badge_mil, lv_color_hex(0x283040), LV_PART_MAIN);
     lv_obj_set_style_border_width(g_ui.badge_mil, 1, LV_PART_MAIN);
     lv_obj_set_style_radius(g_ui.badge_mil, 4, LV_PART_MAIN);
-    lv_obj_set_style_pad_hor(g_ui.badge_mil, 4, LV_PART_MAIN);
-    lv_obj_set_style_pad_ver(g_ui.badge_mil, 1, LV_PART_MAIN);
+    lv_obj_set_style_pad_hor(g_ui.badge_mil, 6, LV_PART_MAIN);
+    lv_obj_set_style_pad_ver(g_ui.badge_mil, 2, LV_PART_MAIN);
     lv_obj_clear_flag(g_ui.badge_mil, LV_OBJ_FLAG_SCROLLABLE);
 
     g_ui.lbl_mil = lv_label_create(g_ui.badge_mil);
@@ -768,7 +768,7 @@ static void build_offroad_view(lv_obj_t *parent)
     lv_scale_set_angle_range(g_ui.scale_roll, 180);
     lv_scale_set_rotation(g_ui.scale_roll, 180);
     lv_scale_set_total_tick_count(g_ui.scale_roll, 19);
-    lv_scale_set_major_tick_every(g_ui.scale_roll, 4);
+    lv_scale_set_major_tick_every(g_ui.scale_roll, 3);
     lv_scale_set_label_show(g_ui.scale_roll, true);
     lv_scale_set_text_src(g_ui.scale_roll, g_incline_labels);
 
@@ -795,7 +795,7 @@ static void build_offroad_view(lv_obj_t *parent)
     lv_arc_set_mode(g_ui.arc_roll_val, LV_ARC_MODE_SYMMETRICAL);
     lv_arc_set_range(g_ui.arc_roll_val, -45, 45);
     lv_arc_set_value(g_ui.arc_roll_val, 0);
-    lv_arc_set_bg_angles(g_ui.arc_roll_val, 135, 45); /* 270 degree symmetrical sweep */
+    lv_arc_set_bg_angles(g_ui.arc_roll_val, 180, 0); /* 180 degree symmetrical top sweep */
     lv_arc_set_rotation(g_ui.arc_roll_val, 0);
 
     lv_obj_set_style_arc_color(g_ui.arc_roll_val, lv_color_hex(0x131A26), LV_PART_MAIN);
@@ -863,7 +863,7 @@ static void build_offroad_view(lv_obj_t *parent)
     lv_scale_set_angle_range(g_ui.scale_pitch, 180);
     lv_scale_set_rotation(g_ui.scale_pitch, 180);
     lv_scale_set_total_tick_count(g_ui.scale_pitch, 19);
-    lv_scale_set_major_tick_every(g_ui.scale_pitch, 4);
+    lv_scale_set_major_tick_every(g_ui.scale_pitch, 3);
     lv_scale_set_label_show(g_ui.scale_pitch, true);
     lv_scale_set_text_src(g_ui.scale_pitch, g_incline_labels);
 
@@ -890,7 +890,7 @@ static void build_offroad_view(lv_obj_t *parent)
     lv_arc_set_mode(g_ui.arc_pitch_val, LV_ARC_MODE_SYMMETRICAL);
     lv_arc_set_range(g_ui.arc_pitch_val, -45, 45);
     lv_arc_set_value(g_ui.arc_pitch_val, 0);
-    lv_arc_set_bg_angles(g_ui.arc_pitch_val, 135, 45); /* 270 degree symmetrical sweep */
+    lv_arc_set_bg_angles(g_ui.arc_pitch_val, 180, 0); /* 180 degree symmetrical top sweep */
     lv_arc_set_rotation(g_ui.arc_pitch_val, 0);
 
     lv_obj_set_style_arc_color(g_ui.arc_pitch_val, lv_color_hex(0x131A26), LV_PART_MAIN);
